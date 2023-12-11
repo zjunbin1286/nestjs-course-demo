@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://unpkg.com/axios@0.24.0/dist/axios.min.js"></script>
+</head>
+<body>
+  <h4>1、单文件</h4>
+  <input id="fileInput1" type="file" multiple/><br>
+
+  <h4>2、多文件</h4>
+  <input id="fileInput2" type="file" multiple/><br>
+
+  <h4>3、多个文件的字段</h4>
+  <input id="fileInput3" type="file" multiple/><br>
+
+  <h4>4、并不知道有哪些字段是 file 呢？（自动识别前端传递的字段）</h4>
+  <input id="fileInput4" type="file" multiple/><br>
+
+  <h4>5、使用 multer 的 storage（上传保存为图片，上面四种都是二进制）</h4>
+  <input id="fileInput5" type="file" multiple/><br>
+
+  <h4>6、对上传的文件做一些限制，比如文件大小、类型等</h4>
+  <input id="fileInput6" type="file" multiple/><br>
+
+  <h4>7、直接用 Nest 给封装好的 文件大小、类型的校验这种逻辑</h4>
+  <input id="fileInput7" type="file" multiple/><br>
+
+  <h4>8、使用自己实现的 validator 进行校验</h4>
+  <input id="fileInput8" type="file" multiple/><br>
+
+  <script>
+    const fileInput1 = document.querySelector('#fileInput1');
+    const fileInput2 = document.querySelector('#fileInput2');
+    const fileInput3 = document.querySelector('#fileInput3');
+    const fileInput4 = document.querySelector('#fileInput4');
+    const fileInput5 = document.querySelector('#fileInput5');
+    const fileInput6 = document.querySelector('#fileInput6');
+    const fileInput7 = document.querySelector('#fileInput7');
+    const fileInput8 = document.querySelector('#fileInput8');
+
+    // 1、单文件
+    async function formData1() {
+      const data = new FormData();
+      data.set('name','CoderBin');
+      data.set('age', 23);
+      data.set('aaa', fileInput1.files[0]);
+
+      const res = await axios.post('http://localhost:3000/aaa', data);
+      console.log(res);
+    }
+
+    // 2、多文件
+    async function formData2() {
+      const data = new FormData();
+      data.set('name','CoderBin');
+      data.set('age', 23);
+      [...fileInput2.files].forEach(item => {
+        data.append('bbb', item)
+      })
+
+      const res = await axios.post('http://localhost:3000/bbb', data, {
+        headers: { 'content-type': 'multipart/form-data' }
+      });
+      console.log(res);
+    }
+
+    // 3、多个文件的字段
+    async function formData3() {
+      const data = new FormData();
+      data.set('name','CoderBin');
+      data.set('age', 23);
+      data.append('aaa', fileInput3.files[0]);
+      data.append('aaa', fileInput3.files[1]);
+      data.append('bbb', fileInput3.files[2]);
+      data.append('bbb', fileInput3.files[3]);
+
+      const res = await axios.post('http://localhost:3000/ccc', data);
+      console.log(res);
+    }
+
+    // 4、并不知道有哪些字段是 file 呢？（自动识别前端传递的字段）
+    async function formData4() {
+      const data = new FormData();
+      data.set('name','CoderBin');
+      data.set('age', 23);
+      data.set('aaa', fileInput4.files[0]);
+      data.set('bbb', fileInput4.files[1]);
+      data.set('ccc', fileInput4.files[2]);
+      data.set('ddd', fileInput4.files[3]);
+
+      const res = await axios.post('http://localhost:3000/ddd', data);
+      console.log(res);
+    }
+
+    // TODO 5、使用 multer 的 storage
+    async function formData5() {
+      const data = new FormData();
+      data.set('name','CoderBin');
+      data.set('age', 23);
+      data.set('aaa', fileInput5.files[0]);
+      data.set('bbb', fileInput5.files[1]);
+      data.set('ccc', fileInput5.files[2]);
+      data.set('ddd', fileInput5.files[3]);
+
+      const res = await axios.post('http://localhost:3000/eee', data);
+      console.log(res);
+    }
+
+    // TODO 6、对上传的文件做一些限制，比如文件大小、类型等，很明显，这部分可以放在 pipe 里做
+    async function formData6() {
+      const data = new FormData();
+      data.set('name','CoderBin');
+      data.set('age', 23);
+      data.set('aaa', fileInput6.files[0]);
+
+      const res = await axios.post('http://localhost:3000/fff', data);
+      console.log(res);
+    }
+
+    // TODO 7、直接用 Nest 给封装好的 文件大小、类型的校验这种逻辑
+    async function formData7() {
+      const data = new FormData();
+      data.set('name','CoderBin');
+      data.set('age', 23);
+      data.set('aaa', fileInput7.files[0]);
+
+      const res = await axios.post('http://localhost:3000/ggg', data);
+      console.log(res);
+    }
+
+    // TODO 8、使用自己实现的 validator
+    async function formData8() {
+      const data = new FormData();
+      data.set('name','CoderBin');
+      data.set('age', 23);
+      data.set('aaa', fileInput8.files[0]);
+
+      const res = await axios.post('http://localhost:3000/hhh', data);
+      console.log(res);
+    }
+
+
+    fileInput1.onchange = formData1;
+    fileInput2.onchange = formData2;
+    fileInput3.onchange = formData3;
+    fileInput4.onchange = formData4;
+    fileInput5.onchange = formData5;
+    fileInput6.onchange = formData6;
+    fileInput7.onchange = formData7;
+    fileInput8.onchange = formData8;
+  </script>
+</body>
+</html>
