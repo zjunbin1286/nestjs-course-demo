@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://unpkg.com/axios@0.24.0/dist/axios.min.js"></script>
+</head>
+<body>
+  <input id="fileInput" type="file"/>
+  <br/><br/>
+  <button id="btn">合并文件</button>
+
+  <script>
+    const fileInput = document.querySelector('#fileInput');
+    const btn = document.querySelector('#btn')
+
+    // 定义每个分片的大小（100k）
+    const chunkSize = 100 * 1024;
+
+    fileInput.onchange =  async function () {
+
+      const file = fileInput.files[0];
+
+      // 对拿到的文件进行分片，得到数组
+      const chunks = [];
+      let startPos = 0;
+      while(startPos < file.size) {
+        chunks.push(file.slice(startPos, startPos + chunkSize));
+        startPos += chunkSize;
+      }
+
+      // 随机字符串
+      const randomStr = Math.random().toString().slice(2, 8)
+
+      const tasks = []; // 请求数组
+
+      // 循环分片，分片名字为：随机字符串_文件名-index
+      chunks.map((chunk, index) => {
+        const data = new FormData();
+        // data.set('name', `${randomStr}_${file.name}-${index}`)
+        data.set('name', `${file.name}-${index}`)
+        data.append('files', chunk);
+        tasks.push(axios.post('http://localhost:3000/upload', data));
+      })
+
+      // 利用 all 上传所有分片文件
+      await Promise.all(tasks);
+
+      // 发起合并所有分片文件的请求
+      axios.get(`http://localhost:3000/merge?name=${file.name}`);
+    }
+
+
+    // 发起合并所有分片文件的请求
+    btn.addEventListener('click', () => {
+      const name = prompt('请输入要合并的文件名')
+      if (!name) return
+      axios.get(`http://localhost:3000/merge?name=${name}`).then(res => {
+        const { data } = res
+        if (data.code === 200) {
+          alert(data.msg)
+        }
+      })
+    })
+  </script>
+</body>
+</html>
